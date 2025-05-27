@@ -213,7 +213,8 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     memcpy(&(info.bssid[0]), wfx_rsi.ap_mac.data(), kWifiMacAddressLength);
 
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
-    VerifyOrReturnError(status = RSI_SUCCESS, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "rsi_wlan_get Failed, Error Code : 0x%lX", status));
 
     info.rssi = (-1) * rssi;
 
@@ -226,7 +227,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
 
     int32_t status = rsi_wlan_get(RSI_WLAN_EXT_STATS, reinterpret_cast<uint8_t *>(&stats), sizeof(stats));
     VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "Failed, Error Code : 0x%lX", status));
+                        ChipLogError(DeviceLayer, "rsi_wlan_get Failed, Error Code : 0x%lX", status));
 
     info.beacon_lost_count = stats.beacon_lost_count - temp_reset.beacon_lost_count;
     info.beacon_rx_count   = stats.beacon_rx_count - temp_reset.beacon_rx_count;
@@ -245,7 +246,7 @@ CHIP_ERROR WifiInterfaceImpl::ResetCounters()
 
     int32_t status = rsi_wlan_get(RSI_WLAN_EXT_STATS, reinterpret_cast<uint8_t *>(&stats), sizeof(stats));
     VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
-                        ChipLogError(DeviceLayer, "Failed, Error Code : 0x%lX", status));
+                        ChipLogError(DeviceLayer, "rsi_wlan_get Failed, Error Code : 0x%lX", status));
 
     temp_reset.beacon_lost_count = stats.beacon_lost_count;
     temp_reset.beacon_rx_count   = stats.beacon_rx_count;

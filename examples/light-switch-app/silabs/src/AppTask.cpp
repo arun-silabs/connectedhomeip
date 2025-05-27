@@ -92,10 +92,11 @@ CHIP_ERROR AppTask::AppInit()
 
 void AppTask::Timer::Start()
 {
+    sl_status status = osTimerStart(mHandler, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT_MS));
     // Starts or restarts the function timer
-    if (osTimerStart(mHandler, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT_MS)) != osOK)
+    if (status != osOK)
     {
-        SILABS_LOG("Timer start() failed");
+        SILABS_LOG("Timer start() failed with error code : %lx", status);
         appError(CHIP_ERROR_INTERNAL);
     }
 
@@ -162,7 +163,7 @@ void AppTask::Timer::Stop()
 {
     if (osTimerStop(mHandler) == osError)
     {
-        SILABS_LOG("Timer stop() failed");
+        SILABS_LOG("Timer stop() failed with error code : %lx", osError);
         appError(CHIP_ERROR_INTERNAL);
     }
     mIsActive = false;

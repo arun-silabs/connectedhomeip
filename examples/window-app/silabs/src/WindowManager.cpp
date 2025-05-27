@@ -79,9 +79,10 @@ AppEvent CreateNewEvent(AppEvent::AppEventTypes type)
 void WindowManager::Timer::Start()
 {
     // Starts or restarts the function timer
-    if (osTimerStart(mHandler, pdMS_TO_TICKS(100)) != osOK)
+    sl_status status = osTimerStart(mHandler, pdMS_TO_TICKS(100));
+    if (status != osOK)
     {
-        SILABS_LOG("Timer start() failed");
+        SILABS_LOG("Timer start() failed with error %lx", status);
         appError(CHIP_ERROR_INTERNAL);
     }
 
@@ -530,7 +531,7 @@ void WindowManager::Timer::Stop()
     mIsActive = false;
     if (osTimerStop(mHandler) == osError)
     {
-        SILABS_LOG("Timer stop() failed");
+        SILABS_LOG("Timer stop() failed with error code : %lx", osError);
         appError(CHIP_ERROR_INTERNAL);
     }
 }

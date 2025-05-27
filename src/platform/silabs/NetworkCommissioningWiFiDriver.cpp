@@ -303,7 +303,7 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
     else
     {
         NetworkCommissioning::WiFiScanResponse scanResponse = {};
-
+        
         scanResponse.security.Set(GetInstance().ConvertSecuritytype(aScanResult->security));
         scanResponse.channel = aScanResult->chan;
         scanResponse.rssi    = aScanResult->rssi;

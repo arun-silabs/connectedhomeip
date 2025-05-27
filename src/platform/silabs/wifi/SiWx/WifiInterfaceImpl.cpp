@@ -529,7 +529,7 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: 0x%lx", status));
 
     // Create Sempaphore for scan completion
     sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
@@ -761,7 +761,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
     sl_wifi_statistics_t test = { 0 };
 
     sl_status_t status = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &test);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_wifi_get_statistics failed: 0x%lx", status));
 
     info.beacon_lost_count = test.beacon_lost_count - temp_reset.beacon_lost_count;
     info.beacon_rx_count   = test.beacon_rx_count - temp_reset.beacon_rx_count;
@@ -779,7 +779,7 @@ CHIP_ERROR WifiInterfaceImpl::ResetCounters()
     sl_wifi_statistics_t test = { 0 };
 
     sl_status_t status = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &test);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_wifi_get_statistics failed: 0x%lx", status));
 
     temp_reset.beacon_lost_count = test.beacon_lost_count;
     temp_reset.beacon_rx_count   = test.beacon_rx_count;

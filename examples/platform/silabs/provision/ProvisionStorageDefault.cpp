@@ -91,7 +91,7 @@ CHIP_ERROR WritePage(uint32_t addr, const uint8_t * data, size_t size)
     {
         // Create a temporary buffer, and pad it with "0xff"
         uint8_t * p = static_cast<uint8_t *>(Platform::MemoryAlloc(size_32));
-        VerifyOrReturnError(p != nullptr, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(p != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Memory allocation failed"));
         memcpy(p, data, size);
         memset(p + size, 0xff, size_32 - size);
         CHIP_ERROR err = chip::DeviceLayer::Silabs::GetPlatform().FlashWritePage(addr, p, size_32);
@@ -692,6 +692,7 @@ CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
         {
             // enableKey Hex String doesn't have the correct length
             memset(keySpan.data(), 0, keySpan.size());
+            ChipLogError(DeviceLayer, "Test Event Trigger EnableKey is not the expected length");
             return CHIP_ERROR_INTERNAL;
         }
         err = CHIP_NO_ERROR;

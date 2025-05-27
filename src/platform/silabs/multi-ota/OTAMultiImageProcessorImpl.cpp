@@ -298,7 +298,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ConfirmCurrentImage()
     uint32_t targetVersion;
 
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(SoftwareUpdate, "Requestor is null"));
 
     targetVersion = requestor->GetTargetVersion();
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));

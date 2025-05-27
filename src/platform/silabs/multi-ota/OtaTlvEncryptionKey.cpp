@@ -112,7 +112,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVO
         status = psa_cipher_finish(&operation, output + total_output, sizeof(output) - total_output, &total_output);
         if (status != PSA_SUCCESS)
         {
-            printf("Failed to finish cipher operation\n");
+            printf("Failed to finish cipher operation:%ld\n", status);
             return CHIP_ERROR_INTERNAL;
         }
     }
