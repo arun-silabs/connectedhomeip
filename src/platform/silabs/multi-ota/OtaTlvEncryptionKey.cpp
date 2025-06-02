@@ -46,7 +46,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Import(const uint8_t * key, size_t key_len)
     if (status != PSA_SUCCESS)
     {
         printf("Failed to import a key error:%ld\n", status);
-        return CHIP_ERROR_INTERNAL;
+        return CHIP_PLATFORM_ERROR(status);
     }
 
     return CHIP_NO_ERROR;
@@ -80,21 +80,21 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVO
         if (status != PSA_SUCCESS)
         {
             printf("Failed to begin cipher operation error:%ld\n", status);
-            return CHIP_ERROR_INTERNAL;
+            return CHIP_PLATFORM_ERROR(status);
         }
 
         status = psa_cipher_set_iv(&operation, iv, sizeof(iv));
         if (status != PSA_SUCCESS)
         {
             printf("Failed to set IV error:%ld\n", status);
-            return CHIP_ERROR_INTERNAL;
+            return CHIP_PLATFORM_ERROR(status);
         }
 
         status = psa_cipher_update(&operation, static_cast<uint8_t *>(&block[Offset]), 16, output, sizeof(output), &output_len);
         if (status != PSA_SUCCESS)
         {
             printf("Failed to update cipher operation error:%ld\n", status);
-            return CHIP_ERROR_INTERNAL;
+            return CHIP_PLATFORM_ERROR(status);
         }
 
         /* increment the IV for the next block  */
@@ -113,7 +113,7 @@ CHIP_ERROR OtaTlvEncryptionKey::Decrypt(MutableByteSpan & block, uint32_t & mIVO
         if (status != PSA_SUCCESS)
         {
             printf("Failed to finish cipher operation:%ld\n", status);
-            return CHIP_ERROR_INTERNAL;
+            return CHIP_PLATFORM_ERROR(status);
         }
     }
 

@@ -126,7 +126,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
     if (requestor == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "OTARequestorInterface is null");
+        ChipLogError(SoftwareUpdate, "OTARequestorInterface is null, Invalid OTA Requestor");
         return CHIP_ERROR_INTERNAL;
     }
 

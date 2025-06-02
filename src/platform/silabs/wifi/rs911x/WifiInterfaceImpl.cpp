@@ -213,7 +213,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     memcpy(&(info.bssid[0]), wfx_rsi.ap_mac.data(), kWifiMacAddressLength);
 
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
-    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "rsi_wlan_get Failed, Error Code : 0x%lX", status));
 
     info.rssi = (-1) * rssi;
@@ -226,7 +226,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
     rsi_wlan_ext_stats_t stats = { 0 };
 
     int32_t status = rsi_wlan_get(RSI_WLAN_EXT_STATS, reinterpret_cast<uint8_t *>(&stats), sizeof(stats));
-    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "rsi_wlan_get Failed, Error Code : 0x%lX", status));
 
     info.beacon_lost_count = stats.beacon_lost_count - temp_reset.beacon_lost_count;
@@ -245,7 +245,7 @@ CHIP_ERROR WifiInterfaceImpl::ResetCounters()
     rsi_wlan_ext_stats_t stats = { 0 };
 
     int32_t status = rsi_wlan_get(RSI_WLAN_EXT_STATS, reinterpret_cast<uint8_t *>(&stats), sizeof(stats));
-    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "rsi_wlan_get Failed, Error Code : 0x%lX", status));
 
     temp_reset.beacon_lost_count = stats.beacon_lost_count;
@@ -265,13 +265,13 @@ CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveCo
     int32_t status = RSI_SUCCESS;
 #ifdef RSI_BLE_ENABLE
     status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "BT Powersave Config Failed, Error Code : 0x%lX", status));
 #endif /* RSI_BLE_ENABLE */
 
     // TODO: Support all power modes
     status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "WLAN Powersave Config Failed, Error Code : 0x%lX", status));
 
     return CHIP_NO_ERROR;
@@ -287,7 +287,7 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
 CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 {
     int32_t status = Rs911xPlatformInit();
-    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(status == RSI_SUCCESS, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "Rs911xPlatformInit failed: %lx", status));
     return CHIP_NO_ERROR;
 }

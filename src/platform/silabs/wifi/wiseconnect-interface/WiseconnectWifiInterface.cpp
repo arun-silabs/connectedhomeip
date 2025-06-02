@@ -123,7 +123,7 @@ bool WiseconnectWifiInterface::IsStationReady()
 CHIP_ERROR WiseconnectWifiInterface::TriggerDisconnection()
 {
     sl_status_t status = TriggerPlatformWifiDisconnection();
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Failed to disconnect from the AP: %lx", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, MakeInteger(Range::kPlatform, PlatformCode), ChipLogError(DeviceLayer, "Failed to disconnect from the AP: %lx", status));
     wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
 
     return CHIP_NO_ERROR;

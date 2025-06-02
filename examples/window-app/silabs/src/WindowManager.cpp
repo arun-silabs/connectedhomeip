@@ -83,7 +83,7 @@ void WindowManager::Timer::Start()
     if (status != osOK)
     {
         SILABS_LOG("Timer start() failed with error %lx", status);
-        appError(CHIP_ERROR_INTERNAL);
+        appError(APP_ERROR_START_TIMER_FAILED);
     }
 
     mIsActive = true;
@@ -513,7 +513,7 @@ WindowManager::Timer::Timer(uint32_t timeoutInMs, Callback callback, void * cont
     if (mHandler == NULL)
     {
         SILABS_LOG("Timer create failed");
-        appError(CHIP_ERROR_INTERNAL);
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 }
 
@@ -532,7 +532,7 @@ void WindowManager::Timer::Stop()
     if (osTimerStop(mHandler) == osError)
     {
         SILABS_LOG("Timer stop() failed with error code : %lx", osError);
-        appError(CHIP_ERROR_INTERNAL);
+        appError(APP_ERROR_STOP_TIMER_FAILED);
     }
 }
 

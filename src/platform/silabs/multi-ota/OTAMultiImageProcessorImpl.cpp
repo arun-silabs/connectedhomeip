@@ -298,7 +298,7 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ConfirmCurrentImage()
     uint32_t targetVersion;
 
     OTARequestorInterface * requestor = chip::GetRequestorInstance();
-    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(SoftwareUpdate, "Requestor is null"));
+    VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(SoftwareUpdate, "Invalid OTA Requestor"));
 
     targetVersion = requestor->GetTargetVersion();
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));

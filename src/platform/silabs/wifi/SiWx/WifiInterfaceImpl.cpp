@@ -529,7 +529,7 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: 0x%lx", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_PLATFORM_ERROR(status), ChipLogError(DeviceLayer, "sl_net_init failed: 0x%lx", status));
 
     // Create Sempaphore for scan completion
     sScanCompleteSemaphore = osSemaphoreNew(1, 0, nullptr);
@@ -544,7 +544,8 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
     VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
 #ifndef SL_MBEDTLS_USE_TINYCRYPT
     // PSA Crypto initialization
-    VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL,
+    status = psa_crypto_init();
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "psa_crypto_init failed: %lx", static_cast<uint32_t>(status)));
 #endif // SL_MBEDTLS_USE_TINYCRYPT
     return CHIP_NO_ERROR;
@@ -761,7 +762,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
     sl_wifi_statistics_t test = { 0 };
 
     sl_status_t status = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &test);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_wifi_get_statistics failed: 0x%lx", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_PLATFORM_ERROR(status), ChipLogError(DeviceLayer, "sl_wifi_get_statistics failed: 0x%lx", status));
 
     info.beacon_lost_count = test.beacon_lost_count - temp_reset.beacon_lost_count;
     info.beacon_rx_count   = test.beacon_rx_count - temp_reset.beacon_rx_count;
@@ -779,7 +780,7 @@ CHIP_ERROR WifiInterfaceImpl::ResetCounters()
     sl_wifi_statistics_t test = { 0 };
 
     sl_status_t status = sl_wifi_get_statistics(SL_WIFI_CLIENT_INTERFACE, &test);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_wifi_get_statistics failed: 0x%lx", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_PLATFORM_ERROR(status), ChipLogError(DeviceLayer, "sl_wifi_get_statistics failed: 0x%lx", status));
 
     temp_reset.beacon_lost_count = test.beacon_lost_count;
     temp_reset.beacon_rx_count   = test.beacon_rx_count;
@@ -813,7 +814,7 @@ sl_status_t WifiInterfaceImpl::TriggerPlatformWifiDisconnection()
 CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval)
 {
     int32_t error = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-    VerifyOrReturnError(error == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(error == RSI_SUCCESS, CHIP_PLATFORM_ERROR(error),
                         ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: %ld", error));
 
     sl_wifi_performance_profile_t wifi_profile = { .profile = ConvertPowerSaveConfiguration(configuration),
@@ -823,7 +824,7 @@ CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveCo
                                                    .listen_interval = static_cast<uint16_t>(listenInterval) };
 
     sl_status_t status = sl_wifi_set_performance_profile(&wifi_profile);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "sl_wifi_set_performance_profile failed: 0x%lx", status));
 
     return CHIP_NO_ERROR;
@@ -837,7 +838,7 @@ CHIP_ERROR WifiInterfaceImpl::ConfigureBroadcastFilter(bool enableBroadcastFilte
     uint8_t filterBcastInTim     = (enableBroadcastFilter) ? 1 : 0;
 
     status = sl_wifi_filter_broadcast(beaconDropThreshold, filterBcastInTim, 1 /* valid till next update*/);
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_PLATFORM_ERROR(status),
                         ChipLogError(DeviceLayer, "sl_wifi_filter_broadcast failed: 0x%lx", static_cast<uint32_t>(status)));
 
     return CHIP_NO_ERROR;
