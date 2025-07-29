@@ -76,9 +76,11 @@ using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 // Can be removed after Wiseconnect fixes region code for all ACX module boards.
 #if defined(EXP_BOARD)
 #define REGION_CODE IGNORE_REGION
-#else
+#endif // def EXP_BOARD
+
+#ifndef REGION_CODE
 #define REGION_CODE US
-#endif
+#endif // !def REGION_CODE
 
 // TODO: This needs to be refactored so we don't need the global object
 WfxRsi_t wfx_rsi;
