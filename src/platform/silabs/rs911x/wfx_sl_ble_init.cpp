@@ -39,10 +39,11 @@ using namespace chip::DeviceLayer::Internal;
  */
 void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_MTU_EVENT,
-                                              .eventData = { .connectionHandle = 1, .rsi_ble_mtu = *rsi_ble_mtu } };
-
-    BLEMgrImpl().BlePostEvent(&bleEvent);
+    sl_bt_msg_t bleMsg = {};
+    bleMsg.header = sl_bt_evt_gatt_mtu_exchanged_id;
+    bleMsg.data.evt_gatt_mtu_exchanged.connection = 1;
+    bleMsg.data.evt_gatt_mtu_exchanged.mtu = rsi_ble_mtu->mtu_size;
+    BLEMgrImpl().BlePostEvent(&bleMsg);
 }
 
 /*==============================================*/
@@ -57,10 +58,22 @@ void SilabsBleWrapper::rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
  */
 void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_GATT_WRITE_EVENT,
-                                              .eventData = {
-                                                  .connectionHandle = 1, .event_id = event_id, .rsi_ble_write = *rsi_ble_write } };
-    BLEMgrImpl().BlePostEvent(&bleEvent);
+    // SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_GATT_WRITE_EVENT,
+    //                                           .eventData = {
+    //                                               .data.handle = 1, .header = event_id, .data.evt_gatt_server_user_write_request.connection = rsi_ble_write->handle,
+    //                                               .data.evt_gatt_server_user_write_request.offset = rsi_ble_write->offset, 
+    //                                               .data.evt_gatt_server_user_write_request.value.len = rsi_ble_write->length, 
+    //                                               .data.evt_gatt_server_user_write_request.value.data = rsi_ble_write->att_value };
+    //                                             //   .connectionHandle = 1, .event_id = event_id, .rsi_ble_write = *rsi_ble_write } };
+    sl_bt_msg_t bleMsg = {};
+    bleMsg.header = event_id;
+    bleMsg.data.evt_gatt_server_user_write_request.connection = rsi_ble_write->handle[0];
+    // bleMsg.data.evt_gatt_server_user_write_request.offset = rsi_ble_write->offset;
+    bleMsg.data.evt_gatt_server_user_write_request.value.len = rsi_ble_write->length;
+    memcpy(bleMsg.data.evt_gatt_server_user_write_request.value.data, 
+        rsi_ble_write->att_value, 
+        rsi_ble_write->length);
+    BLEMgrImpl().BlePostEvent(&bleMsg);
 }
 
 /*==============================================*/
@@ -74,13 +87,13 @@ void SilabsBleWrapper::rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_ev
  */
 void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_CONN_EVENT,
-                                              .eventData = {
-                                                  .connectionHandle = 1,
-                                                  .bondingHandle    = 255,
-                                              } };
-    memcpy(bleEvent.eventData.resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
-    BLEMgrImpl().BlePostEvent(&bleEvent);
+    sl_bt_msg_t bleMsg = {};
+    bleMsg.header = sl_bt_evt_connection_opened_id;
+    bleMsg.data.evt_connection_opened.connection = 1;
+    bleMsg.data.evt_connection_opened.bonding = 255;
+    memcpy(bleMsg.data.evt_connection_opened.address.addr, resp_enh_conn->dev_addr, 6);
+    // memcpy(bleEvent.eventData.resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
+    BLEMgrImpl().BlePostEvent(&bleMsg);
 }
 
 /*==============================================*/
@@ -95,8 +108,10 @@ void SilabsBleWrapper::rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhanc
  */
 void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_DISCONN_EVENT, .eventData = { .reason = reason } };
-    BLEMgrImpl().BlePostEvent(&bleEvent);
+    sl_bt_msg_t bleMsg = {};
+    bleMsg.header = sl_bt_evt_connection_closed_id;
+    bleMsg.data.evt_connection_closed.reason = reason;
+    BLEMgrImpl().BlePostEvent(&bleMsg);
 }
 
 /*==============================================*/
@@ -111,10 +126,13 @@ void SilabsBleWrapper::rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * 
 void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_status,
                                                                 rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_GATT_INDICATION_CONFIRMATION,
-                                              .eventData = { .resp_status               = resp_status,
-                                                             .rsi_ble_event_set_att_rsp = *rsi_ble_event_set_att_rsp } };
-    BLEMgrImpl().BlePostEvent(&bleEvent);
+
+    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_GATT_INDICATION_CONFIRMATION };
+                                            //   .eventData = { .resp_status               = resp_status,
+                                            //                  .rsi_ble_event_set_att_rsp = *rsi_ble_event_set_att_rsp } };
+    sl_bt_msg_t bleMsg = {};
+    bleMsg.header = sl_bt_evt_gatt_server_characteristic_status_id;
+    BLEMgrImpl().BlePostEvent(&bleMsg);
 }
 
 /*==============================================*/
@@ -129,9 +147,12 @@ void SilabsBleWrapper::rsi_ble_on_event_indication_confirmation(uint16_t resp_st
  */
 void SilabsBleWrapper::rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t * rsi_ble_read_req)
 {
-    SilabsBleWrapper::BleEvent_t bleEvent = { .eventType = BleEventType::RSI_BLE_EVENT_GATT_RD,
-                                              .eventData = { .event_id = event_id, .rsi_ble_read_req = rsi_ble_read_req } };
-    BLEMgrImpl().BlePostEvent(&bleEvent);
+    sl_bt_msg_t bleMsg = {};
+    bleMsg.header = sl_bt_evt_gatt_server_user_read_request_id;
+    bleMsg.data.evt_gatt_server_user_read_request.offset = rsi_ble_read_req->offset;
+    bleMsg.data.evt_gatt_server_user_read_request.characteristic = rsi_ble_read_req->handle;
+    bleMsg.data.evt_gatt_server_user_read_request.att_opcode = rsi_ble_read_req->type;
+    BLEMgrImpl().BlePostEvent(&bleMsg);
 }
 
 /*==============================================*/

@@ -27,6 +27,7 @@
 #include "cmsis_os2.h"
 #include <stdbool.h>
 #include <string.h>
+#include "sl_bt_api.h"
 
 extern "C" {
 #include <rsi_ble.h>
@@ -100,26 +101,10 @@ public:
         RSI_BLE_EVENT_GATT_RD
     };
 
-    struct sl_wfx_msg_t
-    {
-        uint8_t connectionHandle;
-        uint8_t bondingHandle;
-        uint16_t reason;
-        uint16_t event_id;
-        uint16_t resp_status;
-        rsi_ble_event_mtu_t rsi_ble_mtu;
-        rsi_ble_event_write_t rsi_ble_write;
-        rsi_ble_event_enhance_conn_status_t resp_enh_conn;
-        rsi_ble_event_disconnect_t * resp_disconnect;
-        rsi_ble_read_req_t * rsi_ble_read_req;
-        rsi_ble_set_att_resp_t rsi_ble_event_set_att_rsp;
-        uint16_t subscribed;
-    };
-
     struct BleEvent_t
     {
         BleEventType eventType;
-        sl_wfx_msg_t eventData;
+        sl_bt_msg_t eventData;
     };
 
     // ALL Ble functions

@@ -26,13 +26,13 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include "FreeRTOS.h"
 #include "timers.h"
-#if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
+// #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #include "wfx_sl_ble_init.h"
-#else
-#include "gatt_db.h"
+// #else
+// #include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
-#endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
+// #endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 
 namespace chip {
 namespace DeviceLayer {
@@ -51,14 +51,13 @@ public:
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
     // Used for posting the event in the BLE queue
-    void BlePostEvent(SilabsBleWrapper::BleEvent_t * event);
-    void HandleConnectEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
-    void HandleConnectionCloseEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
-    void HandleWriteEvent(const SilabsBleWrapper::sl_wfx_msg_t & evt);
-    void UpdateMtu(const SilabsBleWrapper::sl_wfx_msg_t & evt);
+    void BlePostEvent(sl_bt_msg_t * evt);
+    void HandleConnectEvent(sl_bt_msg_t * evt);
+    void HandleConnectionCloseEvent(sl_bt_msg_t * evt);
+    void HandleWriteEvent(sl_bt_msg_t * evt);
+    void UpdateMtu(sl_bt_msg_t * evt);
     void HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId);
-    void HandleTXCharCCCDWrite(const SilabsBleWrapper::sl_wfx_msg_t & evt);
-    void HandleSoftTimerEvent(void);
+    void HandleTXCharCCCDWrite(sl_bt_msg_t * evt);
     int32_t SendBLEAdvertisementCommand(void);
 #else
     void HandleConnectEvent(volatile sl_bt_msg_t * evt);
@@ -75,7 +74,8 @@ public:
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    static void HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & rsi_ble_read_req);
+    // static void HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & rsi_ble_read_req);
+    static void HandleC3ReadRequest(sl_bt_msg_t * evt);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
@@ -93,7 +93,7 @@ private:
     osMessageQueueId_t sBleEventQueue = NULL;
     static void sl_ble_event_handling_task(void * args);
     void sl_ble_init();
-    void ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent);
+    void ProcessEvent(sl_bt_msg_t inEvent);
 #endif
 
     // ===== Members that implement the BLEManager internal interface.
@@ -183,7 +183,7 @@ private:
 #endif
 
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-    void HandleRXCharWrite(const SilabsBleWrapper::sl_wfx_msg_t & evt);
+    void HandleRXCharWrite(sl_bt_msg_t * evt);
 #else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);
 #endif
