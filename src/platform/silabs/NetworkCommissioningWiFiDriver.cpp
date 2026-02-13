@@ -84,8 +84,8 @@ CHIP_ERROR SlWiFiDriver::CommitConfiguration()
         SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
     ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials,
                                                            mStagingNetwork.credentialsLen));
-    ReturnErrorOnFailure(
-        SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &kDefaultSecurityBitmap, sizeof(kDefaultSecurityBitmap)));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &kDefaultSecurityBitmap,
+                                                           sizeof(kDefaultSecurityBitmap)));
 
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;

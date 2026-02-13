@@ -43,9 +43,9 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
-using WiFiBandEnum   = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
-using WiFiSecurity  = chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
-using WiFiSecFlags  = chip::BitFlags<WiFiSecurity>;
+using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
+using WiFiSecurity = chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+using WiFiSecFlags = chip::BitFlags<WiFiSecurity>;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
@@ -800,7 +800,7 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
                   "Time: %d, Number of prob: %d",
                   ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
     (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
-    const WiFiSecFlags & sec  = wifi_provision.security;
+    const WiFiSecFlags & sec = wifi_provision.security;
     if (sec.Has(WiFiSecurity::kWpa3Personal))
     {
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA3_SAE;
@@ -879,7 +879,7 @@ void WifiInterfaceImpl::ConnectionEventCallback(sl_wfx_connect_ind_body_t connec
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
 
-        ap_info.chan = connect_indication_body.channel;
+        ap_info.chan     = connect_indication_body.channel;
         ap_info.security = wifi_provision.security;
 
         // Store SSID
