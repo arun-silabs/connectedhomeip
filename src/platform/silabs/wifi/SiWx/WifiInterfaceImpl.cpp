@@ -204,30 +204,42 @@ constexpr uint8_t kWfxQueueSize = 10;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
-// Convert sl_wifi_security_t to wfx_sec_t
-static wfx_sec_t ConvertSlWifiSecurityToWfx(sl_wifi_security_t security)
+using namespace chip::app::Clusters::NetworkCommissioning;
+
+// Convert sl_wifi_security_t to Matter WiFiSecurityBitmap flags
+static WiFiSecurityFlags ConvertSlWifiSecurityToBitmap(sl_wifi_security_t security)
 {
+    WiFiSecurityFlags flags;
     switch (security)
     {
     case SL_WIFI_OPEN:
-        return WFX_SEC_NONE;
+        flags.Set(WiFiSecurityBitmap::kUnencrypted);
+        break;
     case SL_WIFI_WEP:
-        return WFX_SEC_WEP;
+        flags.Set(WiFiSecurityBitmap::kWep);
+        break;
     case SL_WIFI_WPA:
-    case SL_WIFI_WPA_ENTERPRISE: // map enterprise to WPA as closest
-        return WFX_SEC_WPA;
+    case SL_WIFI_WPA_ENTERPRISE:
+        flags.Set(WiFiSecurityBitmap::kWpaPersonal);
+        break;
     case SL_WIFI_WPA2:
-    case SL_WIFI_WPA2_ENTERPRISE: // map enterprise to WPA2 as closest
+    case SL_WIFI_WPA2_ENTERPRISE:
+        flags.Set(WiFiSecurityBitmap::kWpa2Personal);
+        break;
     case SL_WIFI_WPA_WPA2_MIXED:
-        return WFX_SEC_WPA2;
+        flags.Set(WiFiSecurityBitmap::kWpaPersonal);
+        flags.Set(WiFiSecurityBitmap::kWpa2Personal);
+        break;
     case SL_WIFI_WPA3_TRANSITION:
-    case SL_WIFI_WPA3_TRANSITION_ENTERPRISE: // map enterprise to WPA3 transition
+    case SL_WIFI_WPA3_TRANSITION_ENTERPRISE:
     case SL_WIFI_WPA3:
     case SL_WIFI_WPA3_ENTERPRISE:
-        return WFX_SEC_WPA3; // map enterprise to WPA3
+        flags.Set(WiFiSecurityBitmap::kWpa3Personal);
+        break;
     default:
-        return WFX_SEC_UNSPECIFIED;
+        break;
     }
+    return flags;
 }
 
 /**
@@ -271,9 +283,8 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
         chip::MutableByteSpan outBssid(currentScanResult.bssid, kWifiMacAddressLength);
         ReturnValueOnFailure(chip::CopySpanToMutableSpan(inBssid, outBssid), SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
 
-        // Convert sl_wifi_security_t to wfx_sec_t
         currentScanResult.security =
-            ConvertSlWifiSecurityToWfx(static_cast<sl_wifi_security_t>(result->scan_info[i].security_mode));
+            ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(result->scan_info[i].security_mode));
         currentScanResult.rssi = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
         currentScanResult.chan = result->scan_info[i].rf_channel;
         // TODO: change this when SDK provides values
