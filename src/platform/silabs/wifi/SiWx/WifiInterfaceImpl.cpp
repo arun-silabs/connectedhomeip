@@ -232,6 +232,9 @@ static WiFiSecurityFlags ConvertSlWifiSecurityToBitmap(sl_wifi_security_t securi
         break;
     case SL_WIFI_WPA3_TRANSITION:
     case SL_WIFI_WPA3_TRANSITION_ENTERPRISE:
+        flags.Set(WiFiSecurityBitmap::kWpa2Personal);
+        flags.Set(WiFiSecurityBitmap::kWpa3Personal);
+        break;
     case SL_WIFI_WPA3:
     case SL_WIFI_WPA3_ENTERPRISE:
         flags.Set(WiFiSecurityBitmap::kWpa3Personal);
