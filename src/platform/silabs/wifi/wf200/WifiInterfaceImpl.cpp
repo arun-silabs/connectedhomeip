@@ -803,8 +803,7 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
     {
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA3_SAE;
     }
-    else if (sec.HasAny(WiFiSecurityBitmap::kWpa2Personal,
-                        WiFiSecurityBitmap::kWpaPersonal))
+    else if (sec.HasAny(WiFiSecurityBitmap::kWpa2Personal, WiFiSecurityBitmap::kWpaPersonal))
     {
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK;
     }

@@ -205,8 +205,7 @@ constexpr uint8_t kWfxQueueSize = 10;
 constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
 // Convert sl_wifi_security_t to Matter WiFiSecurityBitmap flags
-static chip::BitFlags<WiFiSecurityBitmap>
-ConvertSlWifiSecurityToBitmap(const sl_wifi_security_t security)
+static chip::BitFlags<WiFiSecurityBitmap> ConvertSlWifiSecurityToBitmap(const sl_wifi_security_t security)
 {
     chip::BitFlags<WiFiSecurityBitmap> flags;
     switch (security)
@@ -787,7 +786,8 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     // TODO: Convert this to a int8
     int32_t rssi = 0;
 
-    // TODO: sl_wifi_get_wireless_info API is being deprecated with WiseConnect v4.0.x, we need to use the new API sl_wifi_get_interface_info after upgrading to WiseConnect v4.0.x
+    // TODO: sl_wifi_get_wireless_info API is being deprecated with WiseConnect v4.0.x, we need to use the new API
+    // sl_wifi_get_interface_info after upgrading to WiseConnect v4.0.x
     sl_si91x_rsp_wireless_info_t wireless_info = { 0 };
     if (sl_wifi_get_wireless_info(&wireless_info) == SL_STATUS_OK)
     {
@@ -803,7 +803,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
         chip::MutableByteSpan ssidDst(wfx_rsi.credentials.ssid, WFX_MAX_SSID_LENGTH);
         TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(ssidSrc, ssidDst);
         wfx_rsi.credentials.ssidLength = static_cast<uint8_t>(ssid_len);
-        wfx_rsi.credentials.security = ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(wireless_info.sec_type));
+        wfx_rsi.credentials.security   = ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(wireless_info.sec_type));
     }
 
     info.security = wfx_rsi.credentials.security;
