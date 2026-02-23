@@ -74,7 +74,7 @@ extern "C" {
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 using namespace chip::DeviceLayer::Silabs;
-using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
+using namespace chip::app::Clusters::NetworkCommissioning;
 
 // The REGION_CODE macro defines the regulatory region for the Wi-Fi device.
 // The default value is 'US'. Users can override this macro to specify a different region code.
@@ -204,12 +204,11 @@ constexpr uint8_t kWfxQueueSize = 10;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
-using namespace chip::app::Clusters::NetworkCommissioning;
-
 // Convert sl_wifi_security_t to Matter WiFiSecurityBitmap flags
-static WiFiSecurityFlags ConvertSlWifiSecurityToBitmap(sl_wifi_security_t security)
+static chip::BitFlags<WiFiSecurityBitmap>
+ConvertSlWifiSecurityToBitmap(const sl_wifi_security_t security)
 {
-    WiFiSecurityFlags flags;
+    chip::BitFlags<WiFiSecurityBitmap> flags;
     switch (security)
     {
     case SL_WIFI_OPEN:
@@ -227,13 +226,11 @@ static WiFiSecurityFlags ConvertSlWifiSecurityToBitmap(sl_wifi_security_t securi
         flags.Set(WiFiSecurityBitmap::kWpa2Personal);
         break;
     case SL_WIFI_WPA_WPA2_MIXED:
-        flags.Set(WiFiSecurityBitmap::kWpaPersonal);
-        flags.Set(WiFiSecurityBitmap::kWpa2Personal);
+        flags.Set(WiFiSecurityBitmap::kWpaPersonal).Set(WiFiSecurityBitmap::kWpa2Personal);
         break;
     case SL_WIFI_WPA3_TRANSITION:
     case SL_WIFI_WPA3_TRANSITION_ENTERPRISE:
-        flags.Set(WiFiSecurityBitmap::kWpa2Personal);
-        flags.Set(WiFiSecurityBitmap::kWpa3Personal);
+        flags.Set(WiFiSecurityBitmap::kWpa2Personal).Set(WiFiSecurityBitmap::kWpa3Personal);
         break;
     case SL_WIFI_WPA3:
     case SL_WIFI_WPA3_ENTERPRISE:
@@ -790,14 +787,12 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
     // TODO: Convert this to a int8
     int32_t rssi = 0;
 
+    // TODO: sl_wifi_get_wireless_info API is being deprecated with WiseConnect v4.0.x, we need to use the new API sl_wifi_get_interface_info after upgrading to WiseConnect v4.0.x
     sl_si91x_rsp_wireless_info_t wireless_info = { 0 };
     if (sl_wifi_get_wireless_info(&wireless_info) == SL_STATUS_OK)
     {
         size_t ssid_len = strnlen(reinterpret_cast<const char *>(wireless_info.ssid), WFX_MAX_SSID_LENGTH);
-        if (ssid_len > WFX_MAX_SSID_LENGTH)
-        {
-            ssid_len = WFX_MAX_SSID_LENGTH;
-        }
+        VerifyOrReturnError(ssid_len <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_INVALID_STRING_LENGTH);
 
         // Update wfx_rsi with values from sl_wifi_get_wireless_info
         wfx_rsi.ap_chan = static_cast<uint16_t>(wireless_info.channel_number & 0xFF);
@@ -808,11 +803,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
         chip::MutableByteSpan ssidDst(wfx_rsi.credentials.ssid, WFX_MAX_SSID_LENGTH);
         TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(ssidSrc, ssidDst);
         wfx_rsi.credentials.ssidLength = static_cast<uint8_t>(ssid_len);
-        WiFiSecurityFlags sec          = ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(wireless_info.sec_type));
-        if (sec.Raw() != 0)
-        {
-            wfx_rsi.credentials.security = sec;
-        }
+        wfx_rsi.credentials.security = ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(wireless_info.sec_type));
     }
 
     info.security = wfx_rsi.credentials.security;

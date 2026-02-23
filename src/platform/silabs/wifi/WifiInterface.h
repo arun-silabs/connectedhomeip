@@ -56,13 +56,11 @@ constexpr size_t kWifiMacAddressLength = 6;
 #define WFX_MAX_SSID_LENGTH (32)
 #define MAX_JOIN_RETRIES_COUNT (5)
 
-using WiFiSecurityFlags = chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap>;
-
 typedef struct wfx_wifi_scan_result
 {
     uint8_t ssid[WFX_MAX_SSID_LENGTH]; // excludes null-character
     size_t ssid_length;
-    WiFiSecurityFlags security;
+    chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
     uint8_t bssid[kWifiMacAddressLength];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
@@ -150,7 +148,7 @@ public:
         size_t ssidLength                       = 0;
         uint8_t passkey[WFX_MAX_PASSKEY_LENGTH] = { 0 };
         size_t passkeyLength                    = 0;
-        WiFiSecurityFlags security;
+        chip::BitFlags<chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> security;
 
         WifiCredentials & operator=(const WifiCredentials & other)
         {

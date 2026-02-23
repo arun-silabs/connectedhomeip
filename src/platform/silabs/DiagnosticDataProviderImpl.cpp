@@ -357,36 +357,34 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
 
     wfx_wifi_scan_result_t ap = { 0 };
     CHIP_ERROR error          = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
-    if (error == CHIP_NO_ERROR)
+    VerifyOrReturnError(error == CHIP_NO_ERROR, error);
+
+    // Map Matter WiFiSecurityBitmap to WiFiNetworkDiagnostics SecurityTypeEnum (prefer highest)
+    if (ap.security.Has(WiFiSecurityBitmap::kWpa3Personal))
     {
-        // Map Matter WiFiSecurityBitmap to WiFiNetworkDiagnostics SecurityTypeEnum (prefer highest)
-        if (ap.security.Has(WiFiSecurityBitmap::kWpa3Personal))
-        {
-            securityType = SecurityTypeEnum::kWpa3;
-        }
-        else if (ap.security.Has(WiFiSecurityBitmap::kWpa2Personal))
-        {
-            securityType = SecurityTypeEnum::kWpa2;
-        }
-        else if (ap.security.Has(WiFiSecurityBitmap::kWpaPersonal))
-        {
-            securityType = SecurityTypeEnum::kWpa;
-        }
-        else if (ap.security.Has(WiFiSecurityBitmap::kWep))
-        {
-            securityType = SecurityTypeEnum::kWep;
-        }
-        else if (ap.security.Has(WiFiSecurityBitmap::kUnencrypted))
-        {
-            securityType = SecurityTypeEnum::kNone;
-        }
-        else
-        {
-            securityType = SecurityTypeEnum::kUnspecified;
-        }
-        return CHIP_NO_ERROR;
+        securityType = SecurityTypeEnum::kWpa3;
     }
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    else if (ap.security.Has(WiFiSecurityBitmap::kWpa2Personal))
+    {
+        securityType = SecurityTypeEnum::kWpa2;
+    }
+    else if (ap.security.Has(WiFiSecurityBitmap::kWpaPersonal))
+    {
+        securityType = SecurityTypeEnum::kWpa;
+    }
+    else if (ap.security.Has(WiFiSecurityBitmap::kWep))
+    {
+        securityType = SecurityTypeEnum::kWep;
+    }
+    else if (ap.security.Has(WiFiSecurityBitmap::kUnencrypted))
+    {
+        securityType = SecurityTypeEnum::kNone;
+    }
+    else
+    {
+        securityType = SecurityTypeEnum::kUnspecified;
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)

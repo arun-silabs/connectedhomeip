@@ -43,9 +43,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
-using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
-using WiFiSecurity = chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
-using WiFiSecFlags = chip::BitFlags<WiFiSecurity>;
+using namespace ::chip::app::Clusters::NetworkCommissioning;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
@@ -446,23 +444,23 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
     ap->scan.security.ClearAll();
     if (scan_result->security_mode.wpa3)
     {
-        ap->scan.security.Set(WiFiSecurity::kWpa3Personal);
+        ap->scan.security.Set(WiFiSecurityBitmap::kWpa3Personal);
     }
     if (scan_result->security_mode.wpa2)
     {
-        ap->scan.security.Set(WiFiSecurity::kWpa2Personal);
+        ap->scan.security.Set(WiFiSecurityBitmap::kWpa2Personal);
     }
     if (scan_result->security_mode.wpa)
     {
-        ap->scan.security.Set(WiFiSecurity::kWpaPersonal);
+        ap->scan.security.Set(WiFiSecurityBitmap::kWpaPersonal);
     }
     if (scan_result->security_mode.wep)
     {
-        ap->scan.security.Set(WiFiSecurity::kWep);
+        ap->scan.security.Set(WiFiSecurityBitmap::kWep);
     }
     if (!ap->scan.security.HasAny())
     {
-        ap->scan.security.Set(WiFiSecurity::kUnencrypted);
+        ap->scan.security.Set(WiFiSecurityBitmap::kUnencrypted);
     }
 
     ap->scan.chan = scan_result->channel;
@@ -800,20 +798,21 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
                   "Time: %d, Number of prob: %d",
                   ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
     (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
-    const WiFiSecFlags & sec = wifi_provision.security;
-    if (sec.Has(WiFiSecurity::kWpa3Personal))
+    const chip::BitFlags<WiFiSecurityBitmap> & sec = wifi_provision.security;
+    if (sec.Has(WiFiSecurityBitmap::kWpa3Personal))
     {
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA3_SAE;
     }
-    else if (sec.Has(WiFiSecurity::kWpa2Personal) || sec.Has(WiFiSecurity::kWpaPersonal))
+    else if (sec.HasAny(WiFiSecurityBitmap::kWpa2Personal,
+                        WiFiSecurityBitmap::kWpaPersonal))
     {
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK;
     }
-    else if (sec.Has(WiFiSecurity::kWep))
+    else if (sec.Has(WiFiSecurityBitmap::kWep))
     {
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WEP;
     }
-    else if (sec.Has(WiFiSecurity::kUnencrypted))
+    else if (sec.Has(WiFiSecurityBitmap::kUnencrypted))
     {
         connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_OPEN;
     }
