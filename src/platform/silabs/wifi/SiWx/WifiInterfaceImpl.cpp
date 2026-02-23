@@ -398,8 +398,8 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
     }
     else
     {
-        security        = static_cast<sl_wifi_security_t>(scan_result->scan_info[0].security_mode);
-        wfx_rsi.ap_chan = scan_result->scan_info[0].rf_channel;
+        security                     = static_cast<sl_wifi_security_t>(scan_result->scan_info[0].security_mode);
+        wfx_rsi.ap_chan              = scan_result->scan_info[0].rf_channel;
         wfx_rsi.credentials.security = ConvertSlWifiSecurityToBitmap(security);
 
         chip::MutableByteSpan bssidSpan(wfx_rsi.ap_bssid.data(), kWifiMacAddressLength);
@@ -808,7 +808,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
         chip::MutableByteSpan ssidDst(wfx_rsi.credentials.ssid, WFX_MAX_SSID_LENGTH);
         TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(ssidSrc, ssidDst);
         wfx_rsi.credentials.ssidLength = static_cast<uint8_t>(ssid_len);
-        WiFiSecurityFlags sec = ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(wireless_info.sec_type));
+        WiFiSecurityFlags sec          = ConvertSlWifiSecurityToBitmap(static_cast<sl_wifi_security_t>(wireless_info.sec_type));
         if (sec.Raw() != 0)
         {
             wfx_rsi.credentials.security = sec;
