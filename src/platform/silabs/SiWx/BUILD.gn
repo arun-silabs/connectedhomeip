@@ -63,6 +63,8 @@ static_library("SiWx") {
     "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
     "${silabs_platform_dir}/PlatformManagerImpl.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
+    "${silabs_platform_dir}/AliroStorage.cpp",
+    "${silabs_platform_dir}/AliroStorage.h",
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",

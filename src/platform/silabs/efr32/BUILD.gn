@@ -60,6 +60,8 @@ static_library("efr32") {
     "${silabs_platform_dir}/MigrationManager.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
+    "${silabs_platform_dir}/AliroStorage.cpp",
+    "${silabs_platform_dir}/AliroStorage.h",
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",
