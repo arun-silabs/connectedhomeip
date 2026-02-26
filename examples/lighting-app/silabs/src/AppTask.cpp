@@ -33,6 +33,7 @@
 
 #include <assert.h>
 
+#include <platform/silabs/AliroStorage.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -118,6 +119,31 @@ void AppTask::AppTaskMain(void * pvParameter)
     {
         SILABS_LOG("AppTask.Init() failed");
         appError(err);
+    }
+
+    err = chip::DeviceLayer::Internal::AliroStorage::Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("AliroStorage::Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    else
+    {
+        SILABS_LOG("AliroStorage::Init() succeeded");
+        char buf[128];
+        size_t len = 0;
+
+        if (chip::DeviceLayer::Internal::AliroStorage::GetReaderId(buf, sizeof(buf), len) == CHIP_NO_ERROR)
+        {
+            SILABS_LOG("Aliro reader_id: %s", buf);
+        }
+        if (chip::DeviceLayer::Internal::AliroStorage::GetReaderPublicKeyStr(buf, sizeof(buf), len) == CHIP_NO_ERROR)
+        {
+            SILABS_LOG("Aliro reader_public_key_str: %s", buf);
+        }
+        if (chip::DeviceLayer::Internal::AliroStorage::GetReaderGroupSubId(buf, sizeof(buf), len) == CHIP_NO_ERROR)
+        {
+            SILABS_LOG("Aliro reader_group_sub_id: %s", buf);
+        }
     }
 
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
