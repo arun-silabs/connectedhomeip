@@ -99,6 +99,10 @@ constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
 inline constexpr uint32_t kMatterNvm3KeyLoLimit = 0x087200U; // Do not modify without Silabs GSDK team approval
 inline constexpr uint32_t kMatterNvm3KeyHiLimit = 0x087FFFU; // Do not modify without Silabs GSDK team approval
 
+// Aliro NVM3 key range (SL_TOKEN_NVM3_REGION_ALIRO); keys 0x87800-0x87FFF
+inline constexpr uint32_t kAliroNvm3KeyLoLimit = 0x087800U;
+inline constexpr uint32_t kAliroNvm3KeyHiLimit = 0x087FFFU;
+
 class SilabsConfig
 {
 public:
