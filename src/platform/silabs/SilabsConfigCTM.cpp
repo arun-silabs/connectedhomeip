@@ -394,11 +394,11 @@ CHIP_ERROR SilabsConfig::ForEachRecord(Key firstNvm3Key, Key lastNvm3Key, bool a
 
 bool SilabsConfig::ValidConfigKey(Key key)
 {
-    // Returns true if the key is in the Matter nvm3 reserved key range,
+    // Returns true if the key is in the Matter nvm3 used range (0x87200-0x876FF),
     // the Aliro key range, or the User Domain key range.
-    // Additional check validates that the user consciously defined the expected key range for Matter.
-    if (((key >= kMatterNvm3KeyLoLimit) && (key <= kMatterNvm3KeyHiLimit) && (key >= kMinConfigKey_MatterFactory) &&
-         (key <= kMaxConfigKey_MatterKvs)) ||
+    // Matter uses only [kMatterNvm3KeyLoLimit, kMatterNvm3KeyUsedHiLimit]; 0x87700-0x87FFF is unused.
+    if (((key >= kMatterNvm3KeyLoLimit) && (key <= kMatterNvm3KeyUsedHiLimit) &&
+         (key >= kMinConfigKey_MatterFactory) && (key <= kMaxConfigKey_MatterKvs)) ||
         ((key >= kAliroNvm3KeyLoLimit) && (key <= kAliroNvm3KeyHiLimit)) ||
         ((key >= kUserNvm3KeyDomainLoLimit) && (key <= kUserNvm3KeyDomainHiLimit)))
     {

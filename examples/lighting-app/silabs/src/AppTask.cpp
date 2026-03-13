@@ -132,15 +132,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         char buf[128];
         size_t len = 0;
 
-        if (chip::DeviceLayer::Internal::AliroStorage::GetReaderId(buf, sizeof(buf), len) == CHIP_NO_ERROR)
+        if (chip::DeviceLayer::Internal::AliroStorage::RetrieveReaderId(buf, sizeof(buf), len) == CHIP_NO_ERROR)
         {
             SILABS_LOG("Aliro reader_id: %s", buf);
         }
-        if (chip::DeviceLayer::Internal::AliroStorage::GetReaderPublicKeyStr(buf, sizeof(buf), len) == CHIP_NO_ERROR)
+        if (chip::DeviceLayer::Internal::AliroStorage::RetrieveReaderPublicKeyStr(buf, sizeof(buf), len) == CHIP_NO_ERROR)
         {
             SILABS_LOG("Aliro reader_public_key_str: %s", buf);
         }
-        if (chip::DeviceLayer::Internal::AliroStorage::GetReaderGroupSubId(buf, sizeof(buf), len) == CHIP_NO_ERROR)
+        if (chip::DeviceLayer::Internal::AliroStorage::RetrieveReaderGroupSubId(buf, sizeof(buf), len) == CHIP_NO_ERROR)
         {
             SILABS_LOG("Aliro reader_group_sub_id: %s", buf);
         }
