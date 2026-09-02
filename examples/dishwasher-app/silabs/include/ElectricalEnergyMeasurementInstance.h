@@ -19,15 +19,21 @@
 #pragma once
 
 #include "AppConfig.h"
-#include "AppEvent.h"
-#include "ElectricalPowerMeasurementDelegate.h"
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
-#include <cmsis_os2.h>
+#include <system/SystemLayer.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+// Prefer a forward declaration over including the full header when only a
+// pointer/reference is needed (reduces coupling and compile-time dependencies).
+// The complete type is included in the .cpp where methods are called.
+namespace ElectricalPowerMeasurement {
+class ElectricalPowerMeasurementDelegate;
+} // namespace ElectricalPowerMeasurement
+
 namespace ElectricalEnergyMeasurement {
 
 class ElectricalEnergyMeasurementInstance : public ElectricalEnergyMeasurementAttrAccess
@@ -60,14 +66,12 @@ public:
     void CancelTimer();
 
 private:
-    ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * mEPMDelegate;
-    EndpointId mEndpointId;
-    osTimerId_t mTimer;
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * mEPMDelegate = nullptr;
+    EndpointId mEndpointId                                                        = kInvalidEndpointId;
+    bool mTimerActive                                                             = false;
 
-    CHIP_ERROR InitTimer();
-
-    static void TimerEventHandler(void * timerCbArg);
-    static void UpdateEnergyAttributesAndNotify(AppEvent * aEvent);
+    static void TimerEventHandler(System::Layer * systemLayer, void * appState);
+    static void UpdateEnergyAttributesAndNotify(intptr_t arg);
 };
 
 } // namespace ElectricalEnergyMeasurement
