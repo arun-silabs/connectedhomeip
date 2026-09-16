@@ -69,9 +69,11 @@ config CHIP_FACTORY_DATA
 	help
 	  Enables Provision::Storage (ProvisionStorageZephyr) that reads
 	  provisioned credentials and commissionable data from Zephyr settings
-	  stored in the storage partition. Factory data is expected to be
-	  provisioned into NVS separately using Silicon Labs generator
-	  firmware.
+	  NVS (zephyr,settings-partition when set, otherwise storage_partition).
+	  On SiWx917 lighting-app this is settings_partition @ 0x3e1000 (32 KiB),
+	  matching matter_provisioning devices.yaml zephyr flash_addr/flash_size.
+	  Factory data is expected to be provisioned into that NVS region using
+	  Silicon Labs Zephyr generator firmware (provision.py --rtos zephyr).
 
 config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
 	int "Maximum length of rotating device ID unique ID in bytes"

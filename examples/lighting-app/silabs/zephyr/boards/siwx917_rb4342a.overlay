@@ -14,20 +14,34 @@
  * limitations under the License.
  */
 
+/*
+ * M4 free space ends at 0x400000 (start of SoC ota_swap_partition).
+ * code (1912) + factory (4) + settings (32) + storage (92) = 2040 KiB.
+ * Do not place app NVM inside ota_swap — that region is owned by the
+ * NWP/Security Bootloader for RPS firmware upgrade.
+ *
+ * Zephyr factory-data contract (shared with matter_provisioning GFW via
+ * provision.py --rtos zephyr Init flash_addr/flash_size):
+ *   settings_partition @ 0x003e1000, size 0x8000 (32 KiB)
+ * Matter KVS + provisioned factory keys (mt-fct/, mt-sl-fct/) live here.
+ * factory_partition is reserved (unused by ProvisionStorageZephyr).
+ */
+/ {
+	chosen {
+		zephyr,settings-partition = &settings_partition;
+	};
+};
+
 &flash0 {
 	partitions {
-		/*
-		 * M4 free space ends at 0x400000 (start of SoC ota_swap_partition).
-		 * code (1912) + factory (4) + settings (32) + storage (92) = 2040 KiB.
-		 * Do not place app NVM inside ota_swap — that region is owned by the
-		 * NWP/Security Bootloader for RPS firmware upgrade.
-		 */
 		factory_partition: partition@3e0000 {
 			reg = <0x003e0000 DT_SIZE_K(4)>;
+			label = "factory";
 		};
 
 		settings_partition: partition@3e1000 {
 			reg = <0x003e1000 DT_SIZE_K(32)>;
+			label = "settings";
 		};
 	};
 };
@@ -38,4 +52,5 @@
 
 &storage_partition {
 	reg = <0x003e9000 DT_SIZE_K(92)>;
+	label = "storage";
 };
