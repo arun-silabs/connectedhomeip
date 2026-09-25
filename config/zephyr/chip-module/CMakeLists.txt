@@ -201,6 +201,7 @@ if(CONFIG_CHIP)
             ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
             ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
             ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
+            ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/SpanEndpoint.cpp
         )
         target_link_libraries(chip_codedriven_data_model PRIVATE chip)
     endif()
