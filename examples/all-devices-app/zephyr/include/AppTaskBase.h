@@ -26,7 +26,9 @@
 #include <device/api/Interface.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DefaultTimerDelegate.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #include "delegates/ZephyrIdentifyDelegate.h"
 
@@ -130,7 +132,8 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    DeviceLayer::NetworkCommissioning::ZephyrWifiDriver mWifiDriver;
+    DeviceLayer::NetworkCommissioning::ZephyrWifiDriver mWifiDriver = 
+        DeviceLayer::NetworkCommissioning::ZephyrWifiDriver::Instance();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     std::unique_ptr<CodeDrivenDataModelProvider> mDataModelProvider;
